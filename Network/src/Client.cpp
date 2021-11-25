@@ -7,8 +7,7 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "3333"
+
 
 
 Client::Client(std::string address)
@@ -96,17 +95,14 @@ void Client :: Send()
 void Client :: Recieve()
 {
     // Receive until the peer closes the connection
-    do {
+    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    if ( iResult > 0 )
+        printf("Bytes received: %d\n", iResult);
+    else if ( iResult == 0 )
+        printf("Connection closed\n");
+    else
+        printf("recv failed with error: %d\n", WSAGetLastError());
 
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        if ( iResult > 0 )
-            printf("Bytes received: %d\n", iResult);
-        else if ( iResult == 0 )
-            printf("Connection closed\n");
-        else
-            printf("recv failed with error: %d\n", WSAGetLastError());
-
-    } while( iResult > 0 );
     printf("msg recieved: %s\r\n",recvbuf);
 }
 

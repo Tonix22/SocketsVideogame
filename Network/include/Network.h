@@ -1,6 +1,9 @@
 #ifndef Network_H
 #define Network_H
 
+#define DEFAULT_BUFLEN 512
+#define DEFAULT_PORT   "3333"
+
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
@@ -15,9 +18,12 @@ class Network
 	std::string IP;
 	//windows atributes
 	WSADATA wsaData;
-	struct addrinfo *result = NULL,
-                    *ptr    = NULL,
-                     hints;
+	struct addrinfo *result = NULL;
+	struct addrinfo *ptr    = NULL;
+	struct addrinfo hints;
+
+	int recvbuflen       = DEFAULT_BUFLEN;
+	char recvbuf[DEFAULT_BUFLEN];
                      
 	int iResult;
 	

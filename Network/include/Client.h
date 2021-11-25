@@ -7,8 +7,6 @@
 class Client : Network
 {
 	public:
-	int recvbuflen       = DEFAULT_BUFLEN;
-	char recvbuf[DEFAULT_BUFLEN] = {0};
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	Client(std::string address);
 	~Client();
@@ -18,7 +16,6 @@ class Client : Network
 	void Set_Main_Player();
 	void Send();
 	void Recieve();
-	
 };
 
 #endif
