@@ -7,8 +7,7 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "3333"
+
 
 
 Client::Client(std::string address)
@@ -72,7 +71,7 @@ void Client::Establish_Communication()
 void Client :: Send()
 {
     // Send an initial buffer
-    const char *sendbuf = "this is a test";
+    const char *sendbuf = "Write me\r\n";
     iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
     if (iResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
@@ -84,17 +83,27 @@ void Client :: Send()
     printf("Bytes Sent: %ld\n", iResult);
 
     // shutdown the connection since no more data will be sent
+    /*
     iResult = shutdown(ConnectSocket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
         printf("shutdown failed with error: %d\n", WSAGetLastError());
         closesocket(ConnectSocket);
         WSACleanup();
         return;
-    }
+    }*/
 }
 void Client :: Recieve()
 {
+    // Receive until the peer closes the connection
+    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    if ( iResult > 0 )
+        printf("Bytes received: %d\n", iResult);
+    else if ( iResult == 0 )
+        printf("Connection closed\n");
+    else
+        printf("recv failed with error: %d\n", WSAGetLastError());
 
+    printf("msg recieved: %s\r\n",recvbuf);
 }
 
 void Client::Load_Game()

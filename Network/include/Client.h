@@ -1,8 +1,8 @@
 #ifndef Client_H
 #define Client_H
+#define DEFAULT_BUFLEN 512
 
 #include "Network.h"
-
 
 class Client : Network
 {
@@ -16,7 +16,6 @@ class Client : Network
 	void Set_Main_Player();
 	void Send();
 	void Recieve();
-	
 };
 
 #endif

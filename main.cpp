@@ -1,15 +1,20 @@
 #include <Client.h>
-
+#include <Server.h>
 #include <graphics.h>
-
-
 
 
 int main(int argc, char **argv)
 {
-	Client* cl = new Client("127.0.0.1");
-	cl->Establish_Communication();
-    cl->Send();
+	//Client* cl = new Client("127.0.0.1");
+	//cl->Establish_Communication();
+    //cl->Send();
+    //cl->Recieve();
+    //delete cl;
+    //system("pause");
+    Server* sr = new Server();
+    sr->Establish_Communication();
+    sr->Recieve();
+    
 	/*
 	initwindow(800,800);
 	line(200,200,300,300);
