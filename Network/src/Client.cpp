@@ -14,8 +14,9 @@ Client::Client(std::string address) : Network(Client_instance,address)
     // Resolve the server address and port
     IP = address;
 	std::cout<<"client build"<<std::endl;
-}
+    this->mode = Hold;
 
+}
 
 void Client::Establish_Communication()
 {

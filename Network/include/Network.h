@@ -9,6 +9,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <string>
+#include <GameManager.h>
 
 typedef enum
 {
@@ -16,12 +17,14 @@ typedef enum
 	Client_instance
 }Network_entity;
 
+
 class Network
 {
 	public:
 	bool is_connected;
 	bool main_player;
 	Network_entity role;
+	PlayMode mode;
 	std::string IP;
 	//windows atributes
 	WSADATA wsaData;

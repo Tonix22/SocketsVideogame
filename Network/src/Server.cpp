@@ -7,6 +7,7 @@
 Server::Server():Network(Server_instance,"")
 {
     std::cout<<"server build"<<std::endl;
+    this->mode = Play;
 }
 
 void Server::Establish_Communication()

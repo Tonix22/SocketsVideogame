@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 	Socket_test(sr);
 	delete sr;
 	*/
-	Snake_entry_point();
+	Snake_entry_point(Right_Cuadrant,Play);
     return 0;
 	
 }

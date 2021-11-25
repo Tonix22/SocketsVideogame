@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include "config.h"
+#include "snake.h"
+
 
 //Linux
 //gcc test.c -lgraph
@@ -113,11 +115,14 @@ void Place_Apple(Coord* apple)
 {
    if(apple->x !=0 && apple->y!=0)
    {
-      Errase_Section(wall.top_left.x,wall.top_left.y,wall.buttom_right.x-3,wall.buttom_right.y-3);
+      Errase_Section(wall.top_left.x+3,wall.top_left.y+3,wall.buttom_right.x-3,wall.buttom_right.y-3);
    }
 
-   apple->x = getRandrange(APPLE_SIZE,(getmaxx()>>1)-APPLE_SIZE);
-   apple->y = getRandrange(APPLE_SIZE,(getmaxy()>>1)-APPLE_SIZE);
+   apple->x = getRandrange(wall.top_left.x  + APPLE_SIZE,
+                           wall.top_right.x - APPLE_SIZE);
+
+   apple->y = getRandrange(wall.top_left.y    + APPLE_SIZE,
+                           wall.buttom_left.y - APPLE_SIZE);
   
    Draw_apple(apple->x,apple->y,false);
 }
@@ -167,8 +172,11 @@ void Place_Snake_Start(Snake* body)
 {
    if(head == 0)
    {
-      body->pos.x = getRandrange(SNAKE_SIZE,getmaxx()/2-APPLE_SIZE);
-      body->pos.y = getRandrange(APPLE_SIZE,getmaxy()/2-APPLE_SIZE);
+      body->pos.x = getRandrange(SNAKE_SIZE + wall.top_left.x,
+                                 wall.top_right.x-APPLE_SIZE);
+
+      body->pos.y = getRandrange(APPLE_SIZE + wall.top_left.y,
+                                 wall.buttom_left.y-APPLE_SIZE);
    }
 }
 void Draw_Snake(Snake* body)
@@ -207,6 +215,26 @@ bool Snake_Collide_Wall()
    }
    return false;
 }
+
+bool Snake_Collide_MiddleWall(MapLimits side)
+{
+   if(side == Right_Cuadrant)
+   {
+      if((snk[0].pos.x-(SNAKE_SIZE+3)) < wall.buttom_left.x)
+      {
+         return true;
+      }
+   }
+   else if(side == Left_Cuadrant)
+   {
+      if((snk[0].pos.x-(SNAKE_SIZE+2)) > wall.buttom_right.x)
+      {
+         return true;
+      }
+   }
+   return false;
+}
+
 bool Snake_Collide_Snake()
 {
    int i=0;
@@ -260,19 +288,36 @@ void Draw_Grid()
    // line for x1, y1, x2, y2
    line(0, midy, getmaxx(), midy); 
 }
-void Set_Wall_Limits()
+void Set_Wall_Limits(MapLimits lim)
 {
-   wall.top_left.x = 0;
-   wall.top_left.y = 0;
+   if(lim == Left_Cuadrant)
+   {
+      wall.top_left.x = 0;
+      wall.top_left.y = 0;
 
-   wall.top_right.x = getmaxx()/2;
-   wall.top_right.y = wall.top_left.y;
+      wall.top_right.x = getmaxx()/2;
+      wall.top_right.y = wall.top_left.y;
 
-   wall.buttom_right.x = wall.top_right.x;
-   wall.buttom_right.y = getmaxy()/2;
+      wall.buttom_right.x = wall.top_right.x;
+      wall.buttom_right.y = getmaxy()/2;
 
-   wall.buttom_left.x = wall.top_left.x;
-   wall.buttom_left.y = wall.buttom_right.y;
+      wall.buttom_left.x = wall.top_left.x;
+      wall.buttom_left.y = wall.buttom_right.y;
+   }
+   else
+   {
+      wall.top_left.x = getmaxx()/2;
+      wall.top_left.y =  wall.top_left.y;
+
+      wall.top_right.x = getmaxx();
+      wall.top_right.y = wall.top_left.y;
+
+      wall.buttom_right.x = wall.top_right.x;
+      wall.buttom_right.y = getmaxy()/2;
+
+      wall.buttom_left.x = wall.top_left.x;
+      wall.buttom_left.y = wall.buttom_right.y;
+   }
 }
 void get_key(int*key, int*x,int*y,int step)
 {
@@ -299,7 +344,7 @@ void get_key(int*key, int*x,int*y,int step)
 }
 
 
-int Snake_entry_point()
+int Snake_entry_point(MapLimits side, PlayMode state)
 {
    int i, j  = 0;
    int gd    = DETECT,gm; 
@@ -317,11 +362,15 @@ int Snake_entry_point()
    #endif
 
    Draw_Grid();
-   Set_Wall_Limits();
+
+   Set_Wall_Limits(side);
    Place_Apple(&apple);
+   //Dependes on the role
    Place_Snake_Start(&(snk[head]));
+
    i = snk[head].pos.x ;
    j = snk[head].pos.y ;
+   
    while(1)
    {
       get_key(&cmd,&i,&j,step);
@@ -331,36 +380,61 @@ int Snake_entry_point()
       }
       if(cmd!= 0)
       {
-         if(Snake_Collide_Wall())
+         if(state == Play)
          {
-            Erasse_All_Snake();
-            outtextxy(20,20, "You Lose press a key and retry");
-            cmd = getch();
-            Errase_Section(20,20,250,40);
-            get_key(&cmd,&i,&j,step*2);
-            Update_Snake_pos(i,j);
-            Place_Apple(&apple);
+            if(Snake_Collide_Wall())
+            {
+               Erasse_All_Snake();
+               cmd = getch();
+               get_key(&cmd,&i,&j,step*2);
+               Update_Snake_pos(i,j);
+               Place_Apple(&apple);
+            }
+            else if (Snake_Collide_Snake())
+            {
+               Erasse_All_Snake();
+               getch();
+               cmd = 0;
+               Place_Apple(&apple);
+               Place_Snake_Start(&(snk[head]));
+            }
+            
+            else if(CollideApple(snk[head].pos))
+            {
+               Errase_Section(wall.top_left.x+3,wall.top_left.y+3,wall.buttom_right.x-3,wall.buttom_right.y-3);
+               state = Transition;
+               push_snake();
+               Update_Snake_pos(i,j);
+            }
+            else
+            {
+               Update_Snake_pos(i,j);
+            }
          }
-         else if (Snake_Collide_Snake())
+         if(state == Transition)
          {
-            Erasse_All_Snake();
-            outtextxy(20,20, "You Lose press a key and retry");
-            getch();
-            Errase_Section(20,20,250,40);
-            cmd = 0;
-            Place_Apple(&apple);
-            Place_Snake_Start(&(snk[head]));
+            if(Snake_Collide_MiddleWall(side) == true)
+            {
+               int snk_size = head;
+               for (int i = snk_size; i > -1; i--)
+               {
+                  Errase_Snake(i);
+                  head--;
+                  delay(150);
+               }
+               head = 0;
+               snk[0].pos.x = last->x;
+               snk[0].pos.y = last->y;
+               state = Hold;     
+            }
+            else
+            {
+               Update_Snake_pos(i,j);
+            }
          }
-         
-         else if(CollideApple(snk[head].pos))
+         if(state == Hold)
          {
-            Place_Apple(&apple);
-            push_snake();
-            Update_Snake_pos(i,j);
-         }
-         else
-         {
-            Update_Snake_pos(i,j);
+
          }
       }
       delay(150);
