@@ -3,7 +3,7 @@
 
 #include "Network.h"
 
-class Server : Network
+class Server : public Network
 {
     public:
     SOCKET ListenSocket = INVALID_SOCKET;
@@ -15,7 +15,7 @@ class Server : Network
  	void Load_Game();
 	void Play_Game();
 	void Set_Main_Player();
-	void Send();
+	void Send(std::string msg);
 	void Recieve();
 }; 
 

@@ -9,30 +9,11 @@
 #pragma comment (lib, "AdvApi32.lib")
 
 
-
-Client::Client(std::string address)
+Client::Client(std::string address) : Network(Client_instance,address)
 {
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-	if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
-        return;
-    }
-    
-    //Clear Memory
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family   = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
     // Resolve the server address and port
     IP = address;
-    iResult = getaddrinfo(IP.c_str(), DEFAULT_PORT, &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        WSACleanup();
-        return;
-    }
-	std::cout<<"client prepared"<<std::endl;
+	std::cout<<"client build"<<std::endl;
 }
 
 
@@ -68,11 +49,10 @@ void Client::Establish_Communication()
     }
     printf("Socket established\r\n");
 }
-void Client :: Send()
+void Client :: Send(std::string msg)
 {
     // Send an initial buffer
-    const char *sendbuf = "Write me\r\n";
-    iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
+    iResult = send( ConnectSocket, msg.c_str(), msg.size(), 0 );
     if (iResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
         closesocket(ConnectSocket);

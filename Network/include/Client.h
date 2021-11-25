@@ -4,7 +4,7 @@
 
 #include "Network.h"
 
-class Client : Network
+class Client : public Network
 {
 	public:
 	SOCKET ConnectSocket = INVALID_SOCKET;
@@ -14,7 +14,7 @@ class Client : Network
  	void Load_Game();
 	void Play_Game();
 	void Set_Main_Player();
-	void Send();
+	void Send(std::string msg);
 	void Recieve();
 };
 

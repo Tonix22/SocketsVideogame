@@ -10,11 +10,18 @@
 #include <stdlib.h>
 #include <string>
 
+typedef enum
+{
+	Server_instance,
+	Client_instance
+}Network_entity;
+
 class Network
 {
 	public:
 	bool is_connected;
 	bool main_player;
+	Network_entity role;
 	std::string IP;
 	//windows atributes
 	WSADATA wsaData;
@@ -26,16 +33,17 @@ class Network
 	char recvbuf[DEFAULT_BUFLEN];
                      
 	int iResult;
-	
+
+	Network(Network_entity net,std::string ip_str);
+	virtual ~Network() {};
+
 	//Custom Functions
 	virtual void Establish_Communication() = 0;
-	virtual void Send()    = 0;
+	virtual void Send(std::string msg)  = 0;
 	virtual void Recieve() = 0;
 	virtual void Load_Game() = 0;
 	virtual void Play_Game() = 0;
 	virtual void Set_Main_Player() = 0;
-	
-	virtual ~Network() {};
 };
 
 #endif

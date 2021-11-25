@@ -4,29 +4,9 @@
 
 #pragma comment (lib, "Ws2_32.lib")
 
-Server::Server()
+Server::Server():Network(Server_instance,"")
 {
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
-        return;
-    }
-    
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family   = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags    = AI_PASSIVE;
-
-    // Resolve the server address and port
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        WSACleanup();
-        return;
-    }
-
+    std::cout<<"server build"<<std::endl;
 }
 
 void Server::Establish_Communication()
@@ -81,10 +61,10 @@ void Server::Set_Main_Player()
 {
 
 }
-void Server::Send()
+void Server::Send(std::string msg)
 {
     // Echo the buffer back to the sender
-    iSendResult = send(ClientSocket, recvbuf, iResult, 0 );
+    iSendResult = send(ClientSocket, msg.c_str(), msg.size(), 0 );
     if (iSendResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
         closesocket(ClientSocket);

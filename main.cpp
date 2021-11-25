@@ -2,18 +2,23 @@
 #include <Server.h>
 #include <graphics.h>
 
+void Socket_test(Network* net)
+{
+    net->Establish_Communication();
+    net->Send("Hellow partner: please send a message\r\n");
+    net->Recieve();
+}
+
 
 int main(int argc, char **argv)
 {
-	//Client* cl = new Client("127.0.0.1");
-	//cl->Establish_Communication();
-    //cl->Send();
-    //cl->Recieve();
-    //delete cl;
-    //system("pause");
+	Client* cl = new Client("127.0.0.1");
+	Socket_test(cl);
+	delete cl;
+    system("pause");
     Server* sr = new Server();
-    sr->Establish_Communication();
-    sr->Recieve();
+	Socket_test(sr);
+	delete sr;
     
 	/*
 	initwindow(800,800);
