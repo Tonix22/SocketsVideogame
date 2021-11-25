@@ -10,6 +10,7 @@ int main(int argc, char **argv)
 	Client* cl = new Client("127.0.0.1");
 	cl->Establish_Communication();
     cl->Send();
+    cl->Recieve();
 	/*
 	initwindow(800,800);
 	line(200,200,300,300);

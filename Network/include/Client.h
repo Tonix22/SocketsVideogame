@@ -1,12 +1,14 @@
 #ifndef Client_H
 #define Client_H
+#define DEFAULT_BUFLEN 512
 
 #include "Network.h"
-
 
 class Client : Network
 {
 	public:
+	int recvbuflen       = DEFAULT_BUFLEN;
+	char recvbuf[DEFAULT_BUFLEN] = {0};
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	Client(std::string address);
 	~Client();
