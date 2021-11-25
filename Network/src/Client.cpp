@@ -60,9 +60,43 @@ void Client::Establish_Communication()
         }
         break;
     }
-
+    
     freeaddrinfo(result);
+    if (ConnectSocket == INVALID_SOCKET) {
+        printf("Unable to connect to server!\n");
+        WSACleanup();
+        return;
+    }
+    printf("Socket established\r\n");
 }
+void Client :: Send()
+{
+    // Send an initial buffer
+    const char *sendbuf = "this is a test";
+    iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
+    if (iResult == SOCKET_ERROR) {
+        printf("send failed with error: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return;
+    }
+
+    printf("Bytes Sent: %ld\n", iResult);
+
+    // shutdown the connection since no more data will be sent
+    iResult = shutdown(ConnectSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return;
+    }
+}
+void Client :: Recieve()
+{
+
+}
+
 void Client::Load_Game()
 {
 
@@ -76,3 +110,9 @@ void Client::Set_Main_Player()
 
 }
 
+Client::~Client()
+{
+    // cleanup
+    closesocket(ConnectSocket);
+    WSACleanup();
+}

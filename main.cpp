@@ -1,14 +1,15 @@
 #include <Client.h>
 
-//#include <graphics.h>
+#include <graphics.h>
 
 
 
 
 int main(int argc, char **argv)
 {
-	Client* cl = new Client("192.168.5.1");
-	
+	Client* cl = new Client("127.0.0.1");
+	cl->Establish_Communication();
+    cl->Send();
 	/*
 	initwindow(800,800);
 	line(200,200,300,300);
