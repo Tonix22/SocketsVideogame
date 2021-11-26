@@ -227,7 +227,7 @@ bool Snake_Collide_MiddleWall(MapLimits side)
    }
    else if(side == Left_Cuadrant)
    {
-      if((snk[0].pos.x-(SNAKE_SIZE+2)) > wall.buttom_right.x)
+      if((snk[0].pos.x+(SNAKE_SIZE+3)) > wall.buttom_right.x)
       {
          return true;
       }
@@ -350,6 +350,7 @@ int Snake_entry_point(MapLimits side, PlayMode state)
    int gd    = DETECT,gm; 
    int step  = SNAKE_SIZE;
    int cmd  = 0;
+   bool fts=true;
    Coord apple;
    apple.x = 0;
    apple.y = 0;
@@ -364,7 +365,6 @@ int Snake_entry_point(MapLimits side, PlayMode state)
    Draw_Grid();
 
    Set_Wall_Limits(side);
-   Place_Apple(&apple);
    //Dependes on the role
    Place_Snake_Start(&(snk[head]));
 
@@ -382,6 +382,11 @@ int Snake_entry_point(MapLimits side, PlayMode state)
       {
          if(state == Play)
          {
+            if(fts == true)
+            {
+               Place_Apple(&apple);
+               fts = false;
+            }
             if(Snake_Collide_Wall())
             {
                Erasse_All_Snake();
@@ -434,7 +439,8 @@ int Snake_entry_point(MapLimits side, PlayMode state)
          }
          if(state == Hold)
          {
-
+            //when hold ends
+            //fts = true;
          }
       }
       delay(150);
