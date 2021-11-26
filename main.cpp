@@ -3,28 +3,21 @@
 #include <graphics.h>
 #include <Snake.h>
 
-void Socket_test(Network* net)
+void Main_program(Network* net)
 {
     net->Establish_Communication();
-    net->Send("Hellow partner: please send a message\r\n");
-    net->Recieve();
+    Snake_entry_point(net,net->cuadrant,net->mode);
 }
 
 
 int main(int argc, char **argv)
 {
-	//Server* sr = new Server();
-    //sr->Establish_Communication();
-	//Snake_entry_point(sr,Left_Cuadrant,Play);
-	
-	Client* cl = new Client("127.0.0.1");
-	cl->Establish_Communication();
-	Snake_entry_point(cl,Right_Cuadrant,Hold);
-	
-	//Socket_test(sr);
-	/*
+	Server* sr = new Server();
+	Main_program(sr);
 
-	*/
+	//Client* cl = new Client("127.0.0.1");
+	//Main_program(cl);
+
     return 0;
 	
 }

@@ -27,6 +27,7 @@ class Network
 	bool is_connected;
 	bool main_player;
 	Network_entity role;
+	MapLimits cuadrant;
 	PlayMode mode;
 	std::string IP;
 	//windows atributes

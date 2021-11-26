@@ -474,6 +474,14 @@ int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
                }
                if(first_item == true)
                {
+                  if(side == Left_Cuadrant)
+                  {
+                     x-=SNAKE_SIZE;
+                  }
+                  else
+                  {
+                     x+=SNAKE_SIZE;
+                  }
                   Update_Snake_pos(x,y);
                   first_item = false;
                }else

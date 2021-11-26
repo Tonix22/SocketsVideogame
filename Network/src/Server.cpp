@@ -7,13 +7,17 @@
 Server::Server():Network(Server_instance,"")
 {
     std::cout<<"server build"<<std::endl;
-    this->mode = Play;
+    this->mode     = Play;
+    this->cuadrant = Left_Cuadrant;
 }
 
 void Server::Establish_Communication()
 {
     // Create a SOCKET for connecting to server
+    printf("creating socket\r\n");
     ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    printf("listen socket created; %d\r\n",ListenSocket);
+
     if (ListenSocket == INVALID_SOCKET) {
         printf("socket failed with error: %ld\n", WSAGetLastError());
         freeaddrinfo(result);
@@ -21,6 +25,7 @@ void Server::Establish_Communication()
         return;
     }
     // BINDING
+    printf("bind\r\n");
     iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
         printf("bind failed with error: %d\n", WSAGetLastError());
