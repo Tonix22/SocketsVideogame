@@ -17,9 +17,9 @@ CursorRow=16
 TopLine=1
 LeftChar=1
 [Editor_3]
-CursorCol=22
-CursorRow=12
-TopLine=4
+CursorCol=1
+CursorRow=4
+TopLine=19
 LeftChar=1
 [Editor_4]
 CursorCol=33
@@ -37,9 +37,9 @@ CursorRow=4
 TopLine=1
 LeftChar=1
 [Editor_9]
-CursorCol=24
-CursorRow=404
-TopLine=402
+CursorCol=21
+CursorRow=458
+TopLine=441
 LeftChar=1
 [Editor_8]
 CursorCol=1

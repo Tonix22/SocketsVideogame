@@ -13,16 +13,18 @@ void Socket_test(Network* net)
 
 int main(int argc, char **argv)
 {
-	/*
+	//Server* sr = new Server();
+    //sr->Establish_Communication();
+	//Snake_entry_point(sr,Left_Cuadrant,Play);
+	
 	Client* cl = new Client("127.0.0.1");
-	Socket_test(cl);
-	delete cl;
-    system("pause");
-    Server* sr = new Server();
-	Socket_test(sr);
-	delete sr;
+	cl->Establish_Communication();
+	Snake_entry_point(cl,Right_Cuadrant,Hold);
+	
+	//Socket_test(sr);
+	/*
+
 	*/
-	Snake_entry_point(Right_Cuadrant,Play);
     return 0;
 	
 }

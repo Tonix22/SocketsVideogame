@@ -1,7 +1,7 @@
 #ifndef Network_H
 #define Network_H
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 256
 #define DEFAULT_PORT   "3333"
 
 #include <winsock2.h>
@@ -9,6 +9,9 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <vector>
 #include <GameManager.h>
 
 typedef enum
@@ -34,6 +37,7 @@ class Network
 
 	int recvbuflen       = DEFAULT_BUFLEN;
 	char recvbuf[DEFAULT_BUFLEN];
+	std::string sendbuf;
                      
 	int iResult;
 

@@ -76,6 +76,7 @@ void Client :: Send(std::string msg)
 void Client :: Recieve()
 {
     // Receive until the peer closes the connection
+    memset(recvbuf,0,recvbuflen);
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if ( iResult > 0 )
         printf("Bytes received: %d\n", iResult);

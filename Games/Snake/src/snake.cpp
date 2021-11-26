@@ -6,6 +6,7 @@
 #include "snake.h"
 
 
+
 //Linux
 //gcc test.c -lgraph
 
@@ -344,7 +345,7 @@ void get_key(int*key, int*x,int*y,int step)
 }
 
 
-int Snake_entry_point(MapLimits side, PlayMode state)
+int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
 {
    int i, j  = 0;
    int gd    = DETECT,gm; 
@@ -378,7 +379,7 @@ int Snake_entry_point(MapLimits side, PlayMode state)
       {
          break;
       }
-      if(cmd!= 0)
+      if(cmd!= 0 || state == Hold)
       {
          if(state == Play)
          {
@@ -421,8 +422,14 @@ int Snake_entry_point(MapLimits side, PlayMode state)
             if(Snake_Collide_MiddleWall(side) == true)
             {
                int snk_size = head;
+               char intStr[20]={0};
+               sprintf(intStr,"%d,%d,%d\r\n",snk[0].pos.x,snk[0].pos.y,snk_size+1);
+               net->sendbuf = std::string(intStr);
+               net->Send(net->sendbuf);
+               net->sendbuf.clear();
                for (int i = snk_size; i > -1; i--)
                {
+                  net->Send("PUSH\r\n");
                   Errase_Snake(i);
                   head--;
                   delay(150);
@@ -430,7 +437,7 @@ int Snake_entry_point(MapLimits side, PlayMode state)
                head = 0;
                snk[0].pos.x = last->x;
                snk[0].pos.y = last->y;
-               state = Hold;     
+               state = Hold;
             }
             else
             {
@@ -439,8 +446,47 @@ int Snake_entry_point(MapLimits side, PlayMode state)
          }
          if(state == Hold)
          {
-            //when hold ends
-            //fts = true;
+            printf("HOLD\r\n");
+            std::vector<std::string> tokens;
+            net->Recieve();
+            std::stringstream ss(net->recvbuf);
+            while (ss.good()){
+               std::string substr;
+               getline(ss, substr, ',');
+               tokens.push_back(substr);
+            }
+
+            int x = atoi(tokens[0].c_str());
+            int y = atoi(tokens[1].c_str());
+            int elements = atoi(tokens[2].c_str());
+            bool first_item = true;
+            while(elements!=0)
+            {
+               net->Recieve();
+               elements--;
+               if(side == Left_Cuadrant)
+               {
+                  x-=step;
+               }
+               else // Left
+               {
+                  x+=step;
+               }
+               if(first_item == true)
+               {
+                  Update_Snake_pos(x,y);
+                  first_item = false;
+               }else
+               {
+                  push_snake();
+                  Update_Snake_pos(x,y);
+               }
+            }
+            fts   = true;
+            state = Play;
+            i=x;
+            j=y;
+            cmd = (side == Left_Cuadrant)? KEYLEFT : KEYRIGHT;
          }
       }
       delay(150);
