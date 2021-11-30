@@ -157,7 +157,6 @@ int hangman_game(Network* net, PlayMode state){
 				net->Recieve();
 				printf("%s\r\n",net->recvbuf);
 			}
-			net->Recieve();
 			strcpy(word,net->recvbuf);
 			state = Play;
 		}
