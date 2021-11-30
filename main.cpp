@@ -2,11 +2,13 @@
 #include <Server.h>
 #include <graphics.h>
 #include <Snake.h>
+#include <hangman.h>
 
 void Main_program(Network* net)
 {
-    net->Establish_Communication();
-    Snake_entry_point(net,net->cuadrant,net->mode);
+    //net->Establish_Communication();
+    //Snake_entry_point(net,net->cuadrant,net->mode);
+    hangman_game(net,net->mode);
 }
 
 
