@@ -1,14 +1,14 @@
 # Project: Project1
-# Makefile created by Dev-C++ 5.11
+# Makefile created by Dev-C++ 5.9.2
 
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o Network/src/Client.o Network/src/Server.o Network/src/Network.o Games/Snake/src/snake.o GameManager/src/GameManager.o
-LINKOBJ  = main.o Network/src/Client.o Network/src/Server.o Network/src/Network.o Games/Snake/src/snake.o GameManager/src/GameManager.o
+OBJ      = main.o Network/src/Client.o Network/src/Server.o Network/src/Network.o Games/Snake/src/snake.o GameManager/src/GameManager.o Games/Hangman/src/hangman.o
+LINKOBJ  = main.o Network/src/Client.o Network/src/Server.o Network/src/Network.o Games/Snake/src/snake.o GameManager/src/GameManager.o Games/Hangman/src/hangman.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -lbgi -lgdi32 -luser32 -lws2_32 -std=c++11 -m32 -pg -g3
-INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Users/Administrator/Documents/CompuParte3/Network/include" -I"C:/Users/Administrator/Documents/CompuParte3/Games/Snake/include" -I"C:/Users/Administrator/Documents/CompuParte3/GameManager/include"
-CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++" -I"C:/Users/Administrator/Documents/CompuParte3/Network/include" -I"C:/Users/Administrator/Documents/CompuParte3/Games/Snake/include" -I"C:/Users/Administrator/Documents/CompuParte3/GameManager/include"
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/SocketsVideogame/GameManager/include" -I"C:/SocketsVideogame/Games/Snake/include" -I"C:/SocketsVideogame/Network/include" -I"C:/SocketsVideogame/Games/Hangman/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" -I"C:/SocketsVideogame/GameManager/include" -I"C:/SocketsVideogame/Games/Snake/include" -I"C:/SocketsVideogame/Network/include" -I"C:/SocketsVideogame/Games/Hangman/include"
 BIN      = Project1.exe
 CXXFLAGS = $(CXXINCS) -m32 -pg -g3
 CFLAGS   = $(INCS) -m32 -pg -g3
@@ -41,3 +41,6 @@ Games/Snake/src/snake.o: Games/Snake/src/snake.cpp
 
 GameManager/src/GameManager.o: GameManager/src/GameManager.cpp
 	$(CPP) -c GameManager/src/GameManager.cpp -o GameManager/src/GameManager.o $(CXXFLAGS)
+
+Games/Hangman/src/hangman.o: Games/Hangman/src/hangman.cpp
+	$(CPP) -c Games/Hangman/src/hangman.cpp -o Games/Hangman/src/hangman.o $(CXXFLAGS)
