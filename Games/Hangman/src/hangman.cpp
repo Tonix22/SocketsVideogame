@@ -152,6 +152,12 @@ int hangman_game(Network* net, PlayMode state){
 		if(state == Hold)
 		{
 			net->Recieve();
+			while(strcmp(net->recvbuf,"Fail")==0 || strcmp(net->recvbuf,"Good") == 0)
+			{
+				net->Recieve();
+				printf("%s\r\n",net->recvbuf);
+			}
+			net->Recieve();
 			strcpy(word,net->recvbuf);
 			state = Play;
 		}
@@ -176,9 +182,11 @@ int hangman_game(Network* net, PlayMode state){
 				if(estado == fail){
 					part++;
 					ahorcado = draw_man(part);
+					net->Send("Fail");
 				}
 				else if(estado == ok ){
 					corrects++;
+					net->Send("Good");
 				}
 				else if (estado == win){
 					ahorcado = lose;
