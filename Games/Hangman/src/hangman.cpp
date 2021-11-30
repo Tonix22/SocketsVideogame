@@ -142,6 +142,7 @@ int hangman_game(Network* net, PlayMode state){
 	int estado = ok;
 	word = (char*)malloc( 20*sizeof(char));
 	bool finish_game = false;
+	initgraph(&gd,&gm,BGI_PATH);
 	if(state == Play)
 	{
 		state = Transition;
@@ -171,9 +172,7 @@ int hangman_game(Network* net, PlayMode state){
 		}
 		else if(state == Play)
 		{
-			initgraph(&gd,&gm,BGI_PATH);
 			draw_horca();
-		
 			size_word = strlen(word);
 			draw_underlines(size_word);
 			
@@ -192,10 +191,11 @@ int hangman_game(Network* net, PlayMode state){
 					ahorcado = lose;
 				}
 			}
-			closegraph();
 			state = Transition;
+			cleardevice();
 		}
 	}
+	closegraph();
    	return 0;
 	
 }
