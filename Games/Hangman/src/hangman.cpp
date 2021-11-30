@@ -134,41 +134,60 @@ int draw_char(char *word,int times,int size_word){
 
 int hangman_game(Network* net, PlayMode state){
 	
-	int gd    = DETECT,gm; 
-	initgraph(&gd,&gm,BGI_PATH);
+	int gd    = DETECT,gm;
 	int size_word=0, part=0;
 	char *word;
 	int ahorcado = ok;
 	int corrects=0;
 	int estado = ok;
 	word = (char*)malloc( 20*sizeof(char));
-	
-	//Draw_Grid();
-	draw_horca();
-	
-	printf("Ingresa Palabra\n");
-	gets(word);
-	size_word = strlen(word);
-	draw_underlines(size_word);
-	
-	while(!ahorcado){
-		estado = draw_char(word, corrects, size_word);
-		if(estado == fail){
-			part++;
-			ahorcado = draw_man(part);
-		}
-		else if(estado == ok ){
-			corrects++;
-		}
-		else if (estado == win){
-			ahorcado = lose;
-		}
-	
+	bool finish_game = false;
+	if(state == Play)
+	{
+		state = Transition;
 	}
 
-	getch();
-	closegraph();
-   	
+	while(finish_game == false)
+	{
+		if(state == Hold)
+		{
+			net->Recieve();
+			strcpy(word,net->recvbuf);
+			state = Play;
+		}
+		else if(state == Transition)
+		{
+			printf("Bienvenido ahorcado!!\n");
+			printf("Ingresa Palabra\n");
+			gets(word);
+			net->Send(word);
+			state = Hold;
+		}
+		else if(state == Play)
+		{
+			initgraph(&gd,&gm,BGI_PATH);
+			draw_horca();
+		
+			size_word = strlen(word);
+			draw_underlines(size_word);
+			
+			while(!ahorcado){
+				estado = draw_char(word, corrects, size_word);
+				if(estado == fail){
+					part++;
+					ahorcado = draw_man(part);
+				}
+				else if(estado == ok ){
+					corrects++;
+				}
+				else if (estado == win){
+					ahorcado = lose;
+				}
+			}
+			closegraph();
+			state = Transition;
+		}
+	}
    	return 0;
 	
 }
