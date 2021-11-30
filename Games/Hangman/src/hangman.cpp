@@ -93,41 +93,80 @@ void draw_underlines(int size){
 	
 }
 
-int draw_char(char *word,int times,int size_word){
+int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 	int pos_x = 32;
-	char ch=NULL;
+	char ch=0;
 	char arr[2]= {};
 	char *ret=NULL;
 	char *token = NULL;
-	int index =0;
-	printf("Ingresa Letra:\n");
-	ch = getch();
-	ret=strchr(word, ch);
-	if(ret){
-		index = (int)(ret-word);
-		printf("acertada %d, indice %d\n", times,index);
+	std::string str_w2 = std::string(word);
+	const char* word_2 = str_w2.c_str();
+	int index = 0;
+	static std::string already_used;
+
+	if(*times >= size_word)
+	{
+		outtextxy(150, 150, "WIN!");
+		getch();
+		*times=0;
+		already_used.clear();
+		return win;
 	}
-	else{
+
+	if(mode == Play)
+	{
+		printf("Ingresa Letra:\n");
+		printf("%s\r\n",word_2);
+		ch = getch();
+		arr[0]=ch;
+		net->Send(arr);
+		memset(arr,0,2);
+	}
+	else if (mode == Hold)
+	{
+		net->Recieve();//
+		ch = net->recvbuf[0];
+	}
+	
+	int counter = -1;
+	//cacahuate
+	//word_2 ->c
+	//word_2 ->a  pos 1 acahuate index = 1
+		//strchr->ret = 2dir
+	char* incio = (char*)word_2;
+	bool first_match = false;
+	do{
+		word_2 = word_2 + index;
+		ret    = strchr(word_2, ch); //2dir
+		//printf("ret: %s\r\n",ret);
+		if(ret){
+			index = (int)(ret-incio); //3
+			//printf("acertada %d, indice %d\n", times,index);
+			memcpy(arr, ret, 1);
+		
+			if(index <= size_word){
+				if(index==0)	pos_x=32; // -> 0
+				if(index>=1)	pos_x=32+(index*10);
+				outtextxy(pos_x, 215, arr);		
+			}
+			index ++; //1
+			counter++;
+		}
+	}while(ret!=NULL);
+
+	if(counter == -1)
+	{
 		printf("Incorrecto \n");
 		return fail;
 	}
 
-	
-	memcpy(arr, ret, 1);
-	//token = strtok(word,arr);
-	
-	if(times==size_word){;
-		outtextxy(150, 150, "WIN!");
-		return win;
+	if (already_used.find(ch) == std::string::npos) // not found
+	{
+		already_used.push_back(ch); // push
+		*times+=(counter+1);
 	}
-	else if(index <= size_word){
-		if(index==0)	pos_x=32;
-		if(index>=1)	pos_x+=(index*10);
-		
-		outtextxy(pos_x, 215, arr);
-	}
-
 	
+	printf("times:%d\r\n",*times);
 	
 	return ok;
 }
@@ -147,17 +186,33 @@ int hangman_game(Network* net, PlayMode state){
 	{
 		state = Transition;
 	}
+	//TODO ERASE THIS
+	state = Play;
+
 
 	while(finish_game == false)
 	{
 		if(state == Hold)
 		{
+			draw_horca();
 			net->Recieve();
-			while(strcmp(net->recvbuf,"Fail")==0 || strcmp(net->recvbuf,"Good") == 0)
-			{
-				net->Recieve();
-				printf("%s\r\n",net->recvbuf);
+			strcpy(word,net->recvbuf);
+			
+			size_word = strlen(word);
+			draw_underlines(size_word);
+
+			while(!ahorcado){
+				estado = draw_char(word, &corrects, size_word,net,state);
+				if(estado == fail){
+					part++;
+					ahorcado = draw_man(part);
+				}
+				else if (estado == win){
+					ahorcado = lose;
+				}
 			}
+			state = Transition;
+			cleardevice();
 			strcpy(word,net->recvbuf);
 			state = Play;
 		}
@@ -173,19 +228,17 @@ int hangman_game(Network* net, PlayMode state){
 		else if(state == Play)
 		{
 			draw_horca();
+			//TODO 
+			sprintf(word,"cacahuates");
+
 			size_word = strlen(word);
 			draw_underlines(size_word);
 			
 			while(!ahorcado){
-				estado = draw_char(word, corrects, size_word);
+				estado = draw_char(word, &corrects, size_word,net,state);
 				if(estado == fail){
 					part++;
 					ahorcado = draw_man(part);
-					net->Send("Fail");
-				}
-				else if(estado == ok ){
-					corrects++;
-					net->Send("Good");
 				}
 				else if (estado == win){
 					ahorcado = lose;

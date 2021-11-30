@@ -6,19 +6,19 @@
 
 void Main_program(Network* net)
 {
-    net->Establish_Communication();
+    //net->Establish_Communication();
     //Snake_entry_point(net,net->cuadrant,net->mode);
     hangman_game(net,net->mode);
 }
- 
+
 
 int main(int argc, char **argv)
 {
-	Server* sr = new Server();
-	Main_program(sr);
+	//Server* sr = new Server();
+	//Main_program(sr);
 
-	//Client* cl = new Client("127.0.0.1");
-	//Main_program(cl);
+	Client* cl = new Client("25.14.129.131");
+	Main_program(cl);
 
     return 0;
 	
