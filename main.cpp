@@ -6,11 +6,11 @@
 
 void Main_program(Network* net)
 {
-    //net->Establish_Communication();
+    net->Establish_Communication();
     //Snake_entry_point(net,net->cuadrant,net->mode);
     hangman_game(net,net->mode);
 }
-
+ 
 
 int main(int argc, char **argv)
 {

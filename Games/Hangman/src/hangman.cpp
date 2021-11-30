@@ -166,6 +166,7 @@ int hangman_game(Network* net, PlayMode state){
 			printf("Ingresa Palabra\n");
 			gets(word);
 			net->Send(word);
+			ahorcado=0;
 			state = Hold;
 		}
 		else if(state == Play)
