@@ -186,10 +186,7 @@ int hangman_game(Network* net, PlayMode state){
 	{
 		state = Transition;
 	}
-	//TODO ERASE THIS
-	state = Play;
-
-
+	
 	while(finish_game == false)
 	{
 		if(state == Hold)
@@ -228,8 +225,6 @@ int hangman_game(Network* net, PlayMode state){
 		else if(state == Play)
 		{
 			draw_horca();
-			//TODO 
-			sprintf(word,"cacahuates");
 
 			size_word = strlen(word);
 			draw_underlines(size_word);
