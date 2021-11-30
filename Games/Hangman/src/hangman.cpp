@@ -182,19 +182,17 @@ int hangman_game(Network* net, PlayMode state){
 	word = (char*)malloc( 20*sizeof(char));
 	bool finish_game = false;
 	initgraph(&gd,&gm,BGI_PATH);
-	if(state == Play)
+
+	if(state == Hold)
 	{
 		state = Transition;
 	}
-	
+
 	while(finish_game == false)
 	{
 		if(state == Hold)
 		{
-			draw_horca();
-			net->Recieve();
-			strcpy(word,net->recvbuf);
-			
+			draw_horca();			
 			size_word = strlen(word);
 			draw_underlines(size_word);
 
@@ -225,6 +223,9 @@ int hangman_game(Network* net, PlayMode state){
 		else if(state == Play)
 		{
 			draw_horca();
+
+			net->Recieve();
+			strcpy(word,net->recvbuf);
 
 			size_word = strlen(word);
 			draw_underlines(size_word);
