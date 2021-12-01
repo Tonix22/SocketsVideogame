@@ -44,9 +44,12 @@ void Server::Establish_Communication()
         WSACleanup();
         return;
     }
-
+    int           nRet;
+    unsigned long ul = 1;
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
+    nRet = ioctlsocket(ClientSocket, FIONBIO, (unsigned long *) &ul);
+    
     if (ClientSocket == INVALID_SOCKET) {
         printf("accept failed with error: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
@@ -72,18 +75,19 @@ void Server::Send(std::string msg)
     // Echo the buffer back to the sender
     iSendResult = send(ClientSocket, msg.c_str(), msg.size(), 0 );
     if (iSendResult == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(ClientSocket);
-        WSACleanup();
+        //printf("send failed with error: %d\n", WSAGetLastError());
+        //closesocket(ClientSocket);
+        //WSACleanup();
         return;
     }
     printf("Bytes sent: %d\n", iSendResult);
 }
 
-void Server::Recieve()
+inline void Server::Recieve()
 {
     memset(recvbuf,0,recvbuflen);
     iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+    if(iResult == WSAEWOULDBLOCK || iResult == -1){return;}
     if (iResult > 0) {
         printf("Bytes received: %d\n", iResult);
         printf("msg: %s\n", recvbuf);
@@ -92,6 +96,9 @@ void Server::Recieve()
     {
         printf("Connection closing...\n");
     }
+    else if(iResult == WSAEWOULDBLOCK){
+		printf("holdon\r\n");
+	}
     else {
         printf("recv failed with error: %d\n", WSAGetLastError());
         closesocket(ClientSocket);

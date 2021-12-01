@@ -48,7 +48,7 @@ class Network
 	//Custom Functions
 	virtual void Establish_Communication() = 0;
 	virtual void Send(std::string msg)  = 0;
-	virtual void Recieve() = 0;
+	virtual inline void Recieve() = 0;
 	virtual void Load_Game() = 0;
 	virtual void Play_Game() = 0;
 	virtual void Set_Main_Player() = 0;

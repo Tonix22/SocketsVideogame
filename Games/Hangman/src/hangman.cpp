@@ -7,7 +7,8 @@
 #include <hangman.h>
 
 #define BGI_PATH "C:\\TURBOC3\\BGI"
-/*
+std::string already_used;
+
 void Draw_lines()
 {
    int midx = getmaxx()/2;
@@ -17,13 +18,13 @@ void Draw_lines()
    // line for x1, y1, x2, y2
    line(0, midy, getmaxx(), midy); 
 }
-*/
+
 /*
 FUNCION DE DIBUJO DEL MONO AHORCADO
 RETORNA TRUE SI DIBUJO 
 RETORNA FALSE SI NO DIBUJO
 */
-int draw_man(int part){
+int draw_man(int part,int* times){
 	
 	int state = ok;
 	
@@ -68,6 +69,8 @@ int draw_man(int part){
 		default:
 			outtextxy(150, 150, "YOU LOSE!");
 			state = lose;
+			already_used.clear();
+			*times = 0;
 			break;
 	}
 	return  state;
@@ -102,12 +105,10 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 	std::string str_w2 = std::string(word);
 	const char* word_2 = str_w2.c_str();
 	int index = 0;
-	static std::string already_used;
 
 	if(*times >= size_word)
 	{
 		outtextxy(150, 150, "WIN!");
-		getch();
 		*times=0;
 		already_used.clear();
 		return win;
@@ -115,8 +116,6 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 
 	if(mode == Play)
 	{
-		printf("Ingresa Letra:\n");
-		printf("%s\r\n",word_2);
 		ch = getch();
 		arr[0]=ch;
 		net->Send(arr);
@@ -124,8 +123,16 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 	}
 	else if (mode == Hold)
 	{
-		net->Recieve();//
+		while(1)
+		{
+			net->Recieve();
+			if(net->recvbuf[0]!=0){
+				break;
+			}
+			delay(300);
+		}
 		ch = net->recvbuf[0];
+
 	}
 	
 	int counter = -1;
@@ -179,10 +186,10 @@ int hangman_game(Network* net, PlayMode state){
 	int ahorcado = ok;
 	int corrects=0;
 	int estado = ok;
-	word = (char*)malloc( 20*sizeof(char));
+	word = (char*)calloc(20,sizeof(char));
 	bool finish_game = false;
 	initgraph(&gd,&gm,BGI_PATH);
-
+	//Draw_lines();
 	if(state == Hold)
 	{
 		state = Transition;
@@ -192,55 +199,75 @@ int hangman_game(Network* net, PlayMode state){
 	{
 		if(state == Hold)
 		{
+			printf("Hold\r\n");
 			draw_horca();			
 			size_word = strlen(word);
 			draw_underlines(size_word);
-
+			corrects = 0;
 			while(!ahorcado){
 				estado = draw_char(word, &corrects, size_word,net,state);
 				if(estado == fail){
 					part++;
-					ahorcado = draw_man(part);
+					ahorcado = draw_man(part,&corrects);
 				}
 				else if (estado == win){
 					ahorcado = lose;
 				}
 			}
-			state = Transition;
 			cleardevice();
-			strcpy(word,net->recvbuf);
+			ahorcado = ok;
+			part = 1;
 			state = Play;
 		}
 		else if(state == Transition)
 		{
+			printf("Transition\r\n");
 			printf("Bienvenido ahorcado!!\n");
 			printf("Ingresa Palabra\n");
-			gets(word);
+			int i=0;
+			do
+			{
+				word[i] = getch();
+				printf("%c",word[i++]);
+			}while(word[i-1]!='\n' && word[i-1]!='\r');
 			net->Send(word);
-			ahorcado=0;
+			ahorcado=ok;
 			state = Hold;
 		}
 		else if(state == Play)
 		{
+			corrects = 0;
+			printf("Play\r\n");
 			draw_horca();
-
-			net->Recieve();
+			int toggle = 0;
+			while(1)
+			{
+				net->Recieve();
+				if(net->recvbuf[0]!=0){
+					break;
+				}
+				delay(300);
+			}
 			strcpy(word,net->recvbuf);
 
 			size_word = strlen(word);
 			draw_underlines(size_word);
+
+			printf("Palabra para adivinar: %s\r\n",word);
 			
 			while(!ahorcado){
 				estado = draw_char(word, &corrects, size_word,net,state);
 				if(estado == fail){
 					part++;
-					ahorcado = draw_man(part);
+					ahorcado = draw_man(part,&corrects);
 				}
 				else if (estado == win){
 					ahorcado = lose;
 				}
 			}
 			state = Transition;
+			ahorcado = ok;
+			part=1;
 			cleardevice();
 		}
 	}

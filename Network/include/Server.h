@@ -16,7 +16,7 @@ class Server : public Network
 	void Play_Game();
 	void Set_Main_Player();
 	void Send(std::string msg);
-	void Recieve();
+	inline void Recieve();
 }; 
 
 

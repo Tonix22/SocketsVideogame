@@ -20,12 +20,16 @@ Client::Client(std::string address) : Network(Client_instance,address)
 
 void Client::Establish_Communication()
 {
-    // Attempt to connect to an address until one succeeds
+    // Attempt to connect to an address until one succeed
+    int           nRet;
+    unsigned long ul = 1;
     for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
 
         // Create a SOCKET for connecting to server
         ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, 
             ptr->ai_protocol);
+
+        
         if (ConnectSocket == INVALID_SOCKET) {
             printf("socket failed with error: %ld\n", WSAGetLastError());
             WSACleanup();
@@ -34,18 +38,25 @@ void Client::Establish_Communication()
 
         // Connect to server.
         iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+        
         if (iResult == SOCKET_ERROR) {
             closesocket(ConnectSocket);
             ConnectSocket = INVALID_SOCKET;
             continue;
         }
+        
+        nRet = ioctlsocket(ConnectSocket, FIONBIO, (unsigned long *) &ul);
+        if (nRet != NO_ERROR){
+            printf("ioctlsocket failed with error: %ld\n", nRet);
+        }
+      
         break;
     }
     
     freeaddrinfo(result);
     if (ConnectSocket == INVALID_SOCKET) {
         printf("Unable to connect to server!\n");
-        WSACleanup();
+        //WSACleanup();
         return;
     }
     printf("Socket established\r\n");
@@ -73,11 +84,12 @@ void Client :: Send(std::string msg)
         return;
     }*/
 }
-void Client :: Recieve()
+inline void Client :: Recieve()
 {
     // Receive until the peer closes the connection
     memset(recvbuf,0,recvbuflen);
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    if(iResult == WSAEWOULDBLOCK || iResult == -1){return;}
     if ( iResult > 0 )
         printf("Bytes received: %d\n", iResult);
     else if ( iResult == 0 )
