@@ -9,6 +9,8 @@
 #define BGI_PATH "C:\\TURBOC3\\BGI"
 std::string already_used;
 
+int x_offset = 0;
+
 void Draw_lines()
 {
    int midx = getmaxx()/2;
@@ -31,43 +33,43 @@ int draw_man(int part,int* times){
 	switch(part){
 		
 		case HEAD:
-			circle(100,50,15);					//cabeza
+			circle(100+x_offset,50,15);					//cabeza
 			state = ok;
 			break;
 		case EYE_IZQ:
-			ellipse(93, 45, 0, 360, 1, 3); 		//ojo izq
+			ellipse(93+x_offset, 45, 0, 360, 1, 3); 		//ojo izq
 			state = ok;
 			break;
 		case EYE_DER:
-			ellipse(107, 45, 0, 360, 1, 3); 	//ojo der
+			ellipse(107+x_offset, 45, 0, 360, 1, 3); 	//ojo der
 			state = ok;
 			break;
 		case BOCA:
-			ellipse(100,50,250,300,20,9); 		//boca
+			ellipse(100+x_offset,50,250,300,20,9); 		//boca
 			state = ok;
 			break;
 		case BODY:
-			ellipse(100, 100, 0, 360, 15, 35); 	//cuerpo
+			ellipse(100+x_offset, 100, 0, 360, 15, 35); 	//cuerpo
 			state = ok;
 			break;
 		case HAND_IZQ:
-			line(115, 80, 150, 115);			// mano izq
+			line(115+x_offset, 80, 150+x_offset, 115);			// mano izq
 			state = ok;
 			break;
 		case HAND_DER:
-			line(85, 80, 50, 115);				// mano der
+			line(85+x_offset, 80, 50+x_offset, 115);				// mano der
 			state = ok;
 			break;
 		case FOOT_IZQ:
-			line(115, 125, 125, 180);			// pie izq
+			line(115+x_offset, 125, 125+x_offset, 180);			// pie izq
 			state = ok;
 			break;
 		case FOOT_DER:
-			line(85, 125, 75, 180);				// pie der
+			line(85+x_offset, 125, 75+x_offset, 180);				// pie der
 			state = ok;
 			break;
 		default:
-			outtextxy(150, 150, "YOU LOSE!");
+			outtextxy(150+x_offset, 150, "YOU LOSE!");
 			state = lose;
 			already_used.clear();
 			*times = 0;
@@ -78,11 +80,11 @@ int draw_man(int part,int* times){
 }
 
 void draw_horca(){
-	line(250, 20, 250, 215);		// poste 
-	line(100, 20, 250, 20);			// viga
-	line(200, 215, 300, 215);		// soporte
-	line(100, 20, 100, 40);			// soga
-	line(235, 20, 250, 75);			// trave
+	line(250+x_offset, 20, 250+x_offset, 215);		// poste 
+	line(100+x_offset, 20, 250+x_offset, 20);			// viga
+	line(200+x_offset, 215,300+x_offset, 215);		// soporte
+	line(100+x_offset, 20, 100+x_offset, 40);			// soga
+	line(235+x_offset, 20, 250+x_offset, 75);			// trave
 }
 
 void draw_underlines(int size){
@@ -93,7 +95,6 @@ void draw_underlines(int size){
 		a+=10;
 		b+=10;
 	}
-	
 }
 
 int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
@@ -108,7 +109,7 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 
 	if(*times >= size_word)
 	{
-		outtextxy(150, 150, "WIN!");
+		outtextxy(150+x_offset, 150, "WIN!");
 		*times=0;
 		already_used.clear();
 		return win;
@@ -132,7 +133,6 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 			delay(300);
 		}
 		ch = net->recvbuf[0];
-
 	}
 	
 	int counter = -1;
@@ -154,7 +154,7 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 			if(index <= size_word){
 				if(index==0)	pos_x=32; // -> 0
 				if(index>=1)	pos_x=32+(index*10);
-				outtextxy(pos_x, 215, arr);		
+				outtextxy(pos_x+x_offset, 215, arr);		
 			}
 			index ++; //1
 			counter++;
@@ -178,7 +178,20 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 	return ok;
 }
 
-int hangman_game(Network* net, PlayMode state){
+void set_offset(MapLimits side)
+{
+	if(side == Right_Cuadrant)
+	{
+		x_offset = 300;
+	}
+	else
+	{
+		x_offset = 0;
+	}
+}
+
+
+int hangman_game(Network* net, PlayMode state,MapLimits side){
 	
 	int gd    = DETECT,gm;
 	int size_word=0, part=0;
@@ -189,7 +202,8 @@ int hangman_game(Network* net, PlayMode state){
 	word = (char*)calloc(20,sizeof(char));
 	bool finish_game = false;
 	initgraph(&gd,&gm,BGI_PATH);
-	//Draw_lines();
+	Draw_lines();
+	set_offset(side);
 	if(state == Hold)
 	{
 		state = Transition;
@@ -239,7 +253,7 @@ int hangman_game(Network* net, PlayMode state){
 			corrects = 0;
 			printf("Play\r\n");
 			draw_horca();
-			int toggle = 0;
+			
 			while(1)
 			{
 				net->Recieve();

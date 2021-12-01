@@ -24,6 +24,6 @@ enum estado{
 	fail
 };
 
-int hangman_game(Network* net, PlayMode state);
+int hangman_game(Network* net, PlayMode state,MapLimits side);
 
 #endif
