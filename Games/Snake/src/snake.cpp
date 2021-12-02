@@ -35,7 +35,7 @@ int head = 0;
 /************************************
 *********** COMMON *******************
 *************************************/
-void Non_Blocking_Recive(Network* net)
+void Non_Blocking_Recive_Snake(Network* net)
 {
 	while(1)
 	{
@@ -453,7 +453,7 @@ int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
          {
             printf("HOLD\r\n");
             std::vector<std::string> tokens;
-            Non_Blocking_Recive(net);
+            Non_Blocking_Recive_Snake(net);
             std::stringstream ss(net->recvbuf);
             while (ss.good()){
                std::string substr;
@@ -467,7 +467,7 @@ int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
             bool first_item = true;
             while(elements!=0)
             {
-               Non_Blocking_Recive(net);
+               Non_Blocking_Recive_Snake(net);
                elements--;
                if(side == Left_Cuadrant)
                {
