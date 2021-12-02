@@ -1,11 +1,8 @@
 #include <graphics.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include "config.h"
 #include "snake.h"
-
-
 
 //Linux
 //gcc test.c -lgraph
@@ -39,10 +36,7 @@ int head = 0;
 *********** COMMON *******************
 *************************************/
 
-int getRandrange(int lower, int upper)
-{
-   return (rand() %(upper - lower + 1)) + lower;
-}
+
 void Errase_Section(int x1, int y1,int x2,int y2)
 { 
    int poly[10];   /* our polygon array */

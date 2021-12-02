@@ -1,5 +1,10 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef GAME_MANAGER_H
+#define GAME_MANAGER_H
+#include <time.h>
+#include <string>
+
+#define WORDS_LEN 43
+
 
 typedef enum
 {
@@ -14,5 +19,7 @@ typedef enum
     Left_Cuadrant,
 }MapLimits;
 
+int getRandrange(int lower, int upper);
+std::string get_random_word();
 
 #endif

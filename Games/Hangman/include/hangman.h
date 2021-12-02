@@ -5,7 +5,7 @@
 #include "Network.h"
 
 enum el_man{
-	HEAD = 1,
+	HEAD = 0,
 	EYE_IZQ,
 	EYE_DER,
 	BOCA,
@@ -23,6 +23,11 @@ enum estado{
 	win,
 	fail
 };
+typedef struct Points
+{
+	int Me;
+	int You;
+}Score;
 
 int hangman_game(Network* net, PlayMode state,MapLimits side);
 
