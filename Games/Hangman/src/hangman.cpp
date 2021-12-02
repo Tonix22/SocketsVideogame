@@ -11,6 +11,19 @@ std::string already_used;
 
 int x_offset = 0;
 
+void Non_Blocking_Recive(Network* net)
+{
+	while(1)
+	{
+		net->Recieve();
+		if(net->recvbuf[0]!=0){
+			break;
+		}
+		delay(300);
+	}
+}
+
+
 void Draw_lines()
 {
    int midx = getmaxx()/2;
@@ -91,7 +104,7 @@ void draw_underlines(int size){
 	int i = 0;
 	int a=32, b=40;
 	for(i=0; i<size; i++){
-		line(a, 220, b, 220);		// letra
+		line(a+x_offset, 220, b+x_offset, 220);		// letra
 		a+=10;
 		b+=10;
 	}
@@ -112,6 +125,7 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 		outtextxy(150+x_offset, 150, "WIN!");
 		*times=0;
 		already_used.clear();
+		getch();
 		return win;
 	}
 
@@ -124,14 +138,7 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 	}
 	else if (mode == Hold)
 	{
-		while(1)
-		{
-			net->Recieve();
-			if(net->recvbuf[0]!=0){
-				break;
-			}
-			delay(300);
-		}
+		Non_Blocking_Recive(net);
 		ch = net->recvbuf[0];
 	}
 	
@@ -189,101 +196,100 @@ void set_offset(MapLimits side)
 		x_offset = 0;
 	}
 }
+void toggle_side(MapLimits* side)
+{
+	*side = (MapLimits)(*side^1);
+	set_offset(*side);
+}
 
 
 int hangman_game(Network* net, PlayMode state,MapLimits side){
 	
 	int gd    = DETECT,gm;
-	int size_word=0, part=0;
+	int size_word=0;
+
+	bool finish_game = false;
+	bool finish_match = false;
+
 	char *word;
 	int ahorcado = ok;
-	int corrects=0;
-	int estado = ok;
-	word = (char*)calloc(20,sizeof(char));
-	bool finish_game = false;
-	initgraph(&gd,&gm,BGI_PATH);
-	Draw_lines();
-	set_offset(side);
-	if(state == Hold)
-	{
-		state = Transition;
-	}
+	int estado   = ok;
 
+	Score hits      = {0,0};
+	Score penalties = {0,0};
+
+	PlayMode original = state;
+
+	word = (char*)calloc(20,sizeof(char));
+	srand(time(0));
+
+	initgraph(&gd,&gm,BGI_PATH);
+	
+	Draw_lines();
+	
 	while(finish_game == false)
 	{
-		if(state == Hold)
+		if(net->role == Server_instance)
 		{
-			printf("Hold\r\n");
-			draw_horca();			
-			size_word = strlen(word);
-			draw_underlines(size_word);
-			corrects = 0;
-			while(!ahorcado){
-				estado = draw_char(word, &corrects, size_word,net,state);
-				if(estado == fail){
-					part++;
-					ahorcado = draw_man(part,&corrects);
-				}
-				else if (estado == win){
-					ahorcado = lose;
-				}
-			}
-			cleardevice();
-			ahorcado = ok;
-			part = 1;
-			state = Play;
+			std::string pick = get_random_word();
+			strcpy(word,pick.c_str());
+			net->Send(pick);
 		}
-		else if(state == Transition)
+		if(net->role == Client_instance)
 		{
-			printf("Transition\r\n");
-			printf("Bienvenido ahorcado!!\n");
-			printf("Ingresa Palabra\n");
-			int i=0;
-			do
-			{
-				word[i] = getch();
-				printf("%c",word[i++]);
-			}while(word[i-1]!='\n' && word[i-1]!='\r');
-			net->Send(word);
-			ahorcado=ok;
-			state = Hold;
-		}
-		else if(state == Play)
-		{
-			corrects = 0;
-			printf("Play\r\n");
-			draw_horca();
-			
-			while(1)
-			{
-				net->Recieve();
-				if(net->recvbuf[0]!=0){
-					break;
-				}
-				delay(300);
-			}
+			Non_Blocking_Recive(net);
 			strcpy(word,net->recvbuf);
+		}
 
-			size_word = strlen(word);
+		size_word = strlen(word);
+		
+		for(int cnt=0; cnt < 2; cnt++)
+		{
+			draw_horca();
 			draw_underlines(size_word);
+			toggle_side(&side);
+		}
+		while(finish_match == false)
+		{
+			int* current_penal;
+			int* current_hit;
+			if(state == Play)
+			{
+				current_penal = &(penalties.Me);
+				current_hit   = &(hits.Me);
+			}
+			if(state == Hold)
+			{
+				current_penal = &(penalties.You);
+				current_hit   = &(hits.You);
+				toggle_side(&side);
+			}
 
-			printf("Palabra para adivinar: %s\r\n",word);
-			
-			while(!ahorcado){
-				estado = draw_char(word, &corrects, size_word,net,state);
-				if(estado == fail){
-					part++;
-					ahorcado = draw_man(part,&corrects);
-				}
-				else if (estado == win){
-					ahorcado = lose;
+			estado = draw_char(word, current_hit, size_word,net,state);
+			if(estado == fail){
+				(*current_penal)++;
+				ahorcado = draw_man(*current_penal,current_hit);
+				if(ahorcado == lose)
+				{
+					goto clean;
 				}
 			}
-			state = Transition;
-			ahorcado = ok;
-			part=1;
-			cleardevice();
+			else if (estado == win){
+				clean:
+				memset(&hits,     0,sizeof(Score));
+				memset(&penalties,0,sizeof(Score));
+				finish_match = true;
+			}
+			if(state == Hold)
+			{
+				toggle_side(&side);
+			}
+			state = (PlayMode)(state^1);
 		}
+		finish_game  = (getch()=='q')?true:false;
+		finish_match = false;
+		state = original;
+		cleardevice();
 	}
 	closegraph();
    	return 0;
