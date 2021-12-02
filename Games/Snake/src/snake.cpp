@@ -35,6 +35,17 @@ int head = 0;
 /************************************
 *********** COMMON *******************
 *************************************/
+void Non_Blocking_Recive(Network* net)
+{
+	while(1)
+	{
+		net->Recieve();
+		if(net->recvbuf[0]!=0){
+			break;
+		}
+		delay(300);
+	}
+}
 
 
 void Errase_Section(int x1, int y1,int x2,int y2)
@@ -442,7 +453,7 @@ int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
          {
             printf("HOLD\r\n");
             std::vector<std::string> tokens;
-            net->Recieve();
+            Non_Blocking_Recive(net);
             std::stringstream ss(net->recvbuf);
             while (ss.good()){
                std::string substr;
@@ -456,7 +467,7 @@ int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
             bool first_item = true;
             while(elements!=0)
             {
-               net->Recieve();
+               Non_Blocking_Recive(net);
                elements--;
                if(side == Left_Cuadrant)
                {
