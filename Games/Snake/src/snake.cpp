@@ -434,10 +434,10 @@ int Snake_entry_point(Network* net, MapLimits side, PlayMode state)
                net->sendbuf.clear();
                for (int i = snk_size; i > -1; i--)
                {
+                  delay(300);
                   net->Send("PUSH\r\n");
                   Errase_Snake(i);
                   head--;
-                  delay(150);
                }
                head = 0;
                snk[0].pos.x = last->x;
