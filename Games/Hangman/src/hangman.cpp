@@ -7,7 +7,7 @@
 #include <hangman.h>
 
 #define BGI_PATH "C:\\TURBOC3\\BGI"
-std::string already_used;
+std::string already_used[2];
 
 int x_offset = 0;
 
@@ -29,7 +29,7 @@ void Draw_lines()
    int midx = getmaxx()/2;
    int midy = getmaxy()/2;
    // line for x1, y1, x2, y2
-   line(midx, 0, midx, getmaxy());  
+   line(midx, 0, midx, getmaxy()/2);  
    // line for x1, y1, x2, y2
    line(0, midy, getmaxx(), midy); 
 }
@@ -83,8 +83,10 @@ int draw_man(int part,int* times){
 			break;
 		default:
 			outtextxy(150+x_offset, 150, "YOU LOSE!");
+			outtextxy(100, 300, "Press any key to continue, or q to finish");
 			state = lose;
-			already_used.clear();
+			already_used[Server_instance].clear();
+			already_used[Client_instance].clear();
 			*times = 0;
 			break;
 	}
@@ -119,15 +121,7 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 	std::string str_w2 = std::string(word);
 	const char* word_2 = str_w2.c_str();
 	int index = 0;
-
-	if(*times >= size_word)
-	{
-		outtextxy(150+x_offset, 150, "WIN!");
-		*times=0;
-		already_used.clear();
-		getch();
-		return win;
-	}
+	printf("times:%d >= %d\r\n",*times,size_word);
 
 	if(mode == Play)
 	{
@@ -174,14 +168,21 @@ int draw_char(char *word,int* times,int size_word,Network* net,PlayMode mode){
 		return fail;
 	}
 
-	if (already_used.find(ch) == std::string::npos) // not found
+	if (already_used[mode].find(ch) == std::string::npos) // not found
 	{
-		already_used.push_back(ch); // push
+		already_used[mode].push_back(ch); // push
 		*times+=(counter+1);
 	}
-	
-	printf("times:%d\r\n",*times);
-	
+	if(*times >= size_word)
+	{
+		outtextxy(150+x_offset, 150, "WIN!");
+		*times=0;
+		already_used[Server_instance].clear();
+		already_used[Client_instance].clear();
+		outtextxy(100, 300, "Press any key to continue, or q to finish");
+		return win;
+	}
+
 	return ok;
 }
 
@@ -225,10 +226,9 @@ int hangman_game(Network* net, PlayMode state,MapLimits side){
 
 	initgraph(&gd,&gm,BGI_PATH);
 	
-	Draw_lines();
-	
 	while(finish_game == false)
 	{
+		Draw_lines();
 		if(net->role == Server_instance)
 		{
 			std::string pick = get_random_word();
