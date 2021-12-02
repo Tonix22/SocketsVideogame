@@ -239,6 +239,7 @@ int hangman_game(Network* net, PlayMode state,MapLimits side){
 		{
 			Non_Blocking_Recive(net);
 			strcpy(word,net->recvbuf);
+			toggle_side(&side);
 		}
 
 		size_word = strlen(word);
